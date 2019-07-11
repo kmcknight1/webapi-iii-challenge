@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
     });
 });
 
-router.post(`/:id/posts`, (req, res) => {
+router.post(`/:id/posts`, validatePost, (req, res) => {
   const { text } = req.body;
   const { id } = req.params;
 
@@ -82,8 +82,6 @@ function validateUserId(req, res, next) {
 function validateUser(req, res, next) {
   const user = req.body;
 
-  console.log(user);
-
   if (!Object.keys(user).length) {
     return res.status(400).json({ message: "missing user data" });
   } else if (!user.name) {
@@ -94,7 +92,17 @@ function validateUser(req, res, next) {
 }
 
 //REQUIRED
-function validatePost(req, res, next) {}
+function validatePost(req, res, next) {
+  const post = req.body;
+
+  if (!Object.keys(post).length) {
+    return res.status(400).json({ message: "missing post data" });
+  } else if (!post.text) {
+    return res.status(400).json({ message: "missing required text field" });
+  } else {
+    next();
+  }
+}
 
 // - `validatePost()`
 //   - `validatePost` validates the `body` on a request to create a new post
