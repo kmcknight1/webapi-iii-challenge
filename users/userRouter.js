@@ -15,7 +15,7 @@ router.get("/", (req, res) => {
     });
 });
 
-router.post(`/:id/posts`, validatePost, (req, res) => {
+router.post(`/:id/posts`, validateUserId, validatePost, (req, res) => {
   const { text } = req.body;
   const { id } = req.params;
 
@@ -52,11 +52,42 @@ router.get("/:id", validateUserId, (req, res) => {
     });
 });
 
-// router.get("/:id/posts", (req, res) => {});
+router.get("/:id/posts", validateUserId, (req, res) => {
+  const { id } = req.params;
 
-// router.delete("/:id", (req, res) => {});
+  Users.getUserPosts(id)
+    .then(posts => {
+      res.status(200).json(posts);
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
 
-// router.put("/:id", (req, res) => {});
+router.delete("/:id", validateUserId, (req, res) => {
+  const { id } = req.params;
+
+  Users.remove(id)
+    .then(deleted => {
+      res.status(200).json({ message: `User with ID ${id} was deleted` });
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
+
+router.put("/:id", validateUserId, (req, res) => {
+  const { id } = req.params;
+  const changes = req.body;
+
+  Users.update(id, changes)
+    .then(updated => {
+      res.status(200).json(updated);
+    })
+    .catch(error => {
+      res.status(500).json(error);
+    });
+});
 
 //custom middleware
 
@@ -103,12 +134,5 @@ function validatePost(req, res, next) {
     next();
   }
 }
-
-// - `validatePost()`
-//   - `validatePost` validates the `body` on a request to create a new post
-//   - if the request `body` is missing, cancel the request and respond with
-//   status `400` and `{ message: "missing post data" }`
-//   - if the request `body` is missing the required `text` field, cancel the
-//   request and respond with status `400` and `{ message: "missing required text field" }`
 
 module.exports = router;
