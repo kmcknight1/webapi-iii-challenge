@@ -23,7 +23,7 @@ server.use("/api/users", userRouter);
 
 //global / endpoint
 server.get("/", (req, res) => {
-  res.send(`<h2>Let's write some middleware!</h2>`);
+  res.send(`<h2>Hello! Check out this ${process.env.EV}!</h2>`);
 });
 
 module.exports = server;
